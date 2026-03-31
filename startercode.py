@@ -184,6 +184,18 @@ def get_groups_above_cutoff(cutoff, cache_file):
     RETURNS:
         A dictionary {group_uuid: count} for groups with count >= cutoff only.
     """
+    cache = load_json(cache_file)
+    group_counts = {}
+
+    for url, payload in cache.items():
+        try:
+            group_id = payload["data"]["relationships"]["group"]["data"]["id"]
+            if group_id:
+                group_counts[group_id] = group_counts.get(group_id, 0) + 1
+        except (KeyError, TypeError):
+            continue
+
+    return {k: v for k, v in group_counts.items() if v >= cutoff}
     pass
 
 
