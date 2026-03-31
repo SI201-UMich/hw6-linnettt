@@ -104,6 +104,28 @@ def update_cache(breed_ids, cache_file):
         A string: "Cached data for {percentage}% of breeds",
         where percentage = (successful_new_adds / len(breed_ids)) * 100.
     """
+    cache = load_json(cache_file)
+    successful_new_adds = 0
+
+    for breed_id in breed_ids:
+        url = f"https://dogapi.dog/api/v2/breeds/{breed_id}"
+        if url in cache:
+            continue
+        
+        result = search_breed(breed_id)
+        if result:
+            data, req_url = result
+            cache[req_url] = data
+            successful_new_adds += 1
+
+    create_cache(cache, cache_file)
+
+    if len(breed_ids) == 0:
+        percentage = 0.0
+    else:
+        percentage = (successful_new_adds / len(breed_ids)) * 100
+
+    return f"Cached data for {percentage}% of breeds"
     pass
 
 
